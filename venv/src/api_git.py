@@ -1,3 +1,4 @@
+#Autor: Irache Garamendi - 2020
 import requests
 import time
 import pymongo
@@ -13,8 +14,6 @@ config.read(file_ini)
 
 'client = pymongo.MongoClient("mongodb+srv://UserAct1:<password>@clustervehiculosv0.6kutv.azure.mongodb.net/<dbname>?retryWrites=true&w=majority")'
 'db = client.test'
-MONGODB_HOST = config['mongo']['MONGODB_HOST']
-MONGODB_PORT = config['mongo']['MONGODB_PORT']
 DB_NAME = config['mongo']['DB_NAME']
 COLLECTION_REPOS = config['mongo']['COLLECTION_REPOS']
 COLLECTION_COMMITS = config['mongo']['COLLECTION_COMMITS']
@@ -38,6 +37,7 @@ def checkRateLimit():
     remaining = rate_limit['resources']['core']['remaining']
     print('Request remaining: ' + str(remaining))
     return remaining
+
 #Búsqueda en el repositorio github
 def find_in_repository():
     #Búsqueda en git dentro de los repositorios por palabras con sonarcloud
@@ -55,20 +55,14 @@ def find_in_repository():
         'cache-control': "no-cache",
         'postman-token': "72c78d9c-c7de-9e4d-4825-f7bbaeb8411e"
 }
-
     response = requests.request("GET", url, headers=headers, params=querystring)
-    #responseJson = json.loads(response.content)
     repositoryGit_dict = response.json()
     #Extract data
     # extract, create and insert a dict with project information
-    '''
-     for coll in repositoryGit_dict:
-        for items in coll:
-            print('Estos son los valores para la bbdd' + items[0][0])
-     '''
     #print("find_in_repository: ")
     #print(response.text)
     return repositoryGit_dict
+
 #Crear fichero json e insertar en mong
 def CreateFileJson(reponseJson):
     connection = pymongo.MongoClient('localhost', 27017)
@@ -84,10 +78,9 @@ def CreateFileJson(reponseJson):
             #items es una lista de dict
             if valorKey =='items':
                 d = valor
-                print("CreateFileJson ")
+                print("CreateFileJson: ")
                 print(valor)
-                print
-                "Recorrer lista por Indices"
+                #"Recorrer lista por Indices"
                 for x in range(0, len(valor)):
                     # dato_instantaneo es dict
                     dato_instantaneo = valor[x]
@@ -102,11 +95,9 @@ def main():
     #crear fichero e insertanr en mongo
     CreateFileJson(reponseJson);
 
-
-
     print('\n\nEnd of program!')
 
 main()
 
-# make more requests using "gh_session" to create repos, list issues, etc.
+
 
